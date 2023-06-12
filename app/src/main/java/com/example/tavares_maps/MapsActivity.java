@@ -300,19 +300,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 jObject = new JSONObject(jsonData[0]);
                 CriacaoRota parser = new CriacaoRota();
 
-                JSONArray routesArray = jObject.getJSONArray("routes");
-                JSONObject routeObject = routesArray.getJSONObject(0);
-                JSONArray legsArray = routeObject.getJSONArray("legs");
-                JSONObject legObject = legsArray.getJSONObject(0);
-                JSONObject distanceObject = legObject.getJSONObject("distance");
-                JSONObject durationObject = legObject.getJSONObject("duration");
 
-                distanceText = distanceObject.getString("text");
-                distanceValue  = distanceObject.getInt("value");
-                durationText = durationObject.getString("text");
-                durationValue  = durationObject.getInt("value");
+               JSONArray routesArray = jObject.getJSONArray("routes");
+               JSONObject routeObject = routesArray.getJSONObject(0);
+               JSONArray legsArray = routeObject.getJSONArray("legs");
+               JSONObject legObject = legsArray.getJSONObject(0);
+               JSONObject distanceObject = legObject.getJSONObject("distance");
+               JSONObject durationObject = legObject.getJSONObject("duration");
 
-                textViewtempo_chegada.setText(durationText);
+               distanceText = distanceObject.getString("text");
+               distanceValue  = distanceObject.getInt("value");
+               durationText = durationObject.getString("text");
+               durationValue  = durationObject.getInt("value");
+
+              // textViewtempo_chegada.setText(durationText);
 
 
                 routes = parser.parse(jObject);

@@ -109,10 +109,10 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="201dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="133dp"
-            android:text="Velocidade recomendada: 40km/h" />
+            android:layout_marginStart="199dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="121dp"
+            android:text="Velocidade recomendada:" />
 
         <TextView
             android:id="@+id/vel_atual"
@@ -122,10 +122,10 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="210dp"
-            android:layout_marginTop="544dp"
-            android:layout_marginEnd="67dp"
-            android:layout_marginBottom="163dp"
+            android:layout_marginStart="230dp"
+            android:layout_marginTop="565dp"
+            android:layout_marginEnd="47dp"
+            android:layout_marginBottom="142dp"
             android:text="Velocidade atual:" />
 
         <Button
