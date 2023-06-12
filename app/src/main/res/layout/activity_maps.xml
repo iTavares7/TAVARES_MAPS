@@ -1,9 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MapsActivity" />
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MapsActivity" />
+
+        <Button
+            android:id="@+id/botao_iniciar"
+            android:layout_width="157dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="248dp"
+            android:layout_marginTop="618dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="19dp"
+            android:text="Iniciar Navegação" />
+
+        <TextView
+            android:id="@+id/vel_media"
+            android:layout_width="97dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="138dp"
+            android:layout_marginTop="680dp"
+            android:layout_marginEnd="175dp"
+            android:layout_marginBottom="16dp"
+            android:text="Velocidade média" />
+
+        <TextView
+            android:id="@+id/tempo_deslocamento"
+            android:layout_width="wrap_content"
+            android:layout_height="31dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="580dp"
+            android:layout_marginEnd="212dp"
+            android:layout_marginBottom="119dp"
+            android:text="Tempo de deslocamento:" />
+
+        <TextView
+            android:id="@+id/dist_percorrida"
+            android:layout_width="104dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="621dp"
+            android:layout_marginEnd="289dp"
+            android:layout_marginBottom="63dp"
+            android:text="Distância percorrida" />
+
+        <TextView
+            android:id="@+id/consumo_combustivel"
+            android:layout_width="94dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="680dp"
+            android:layout_marginEnd="296dp"
+            android:layout_marginBottom="16dp"
+            android:text="Consumo:" />
+
+        <TextView
+            android:id="@+id/tempo_chegada"
+            android:layout_width="105dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="134dp"
+            android:layout_marginTop="623dp"
+            android:layout_marginEnd="172dp"
+            android:layout_marginBottom="57dp"
+            android:text="Tempo para chegar ao destino" />
+
+        <TextView
+            android:id="@+id/vel_recomendada"
+            android:layout_width="198dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="201dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="133dp"
+            android:text="Velocidade recomendada: 40km/h" />
+
+        <TextView
+            android:id="@+id/vel_atual"
+            android:layout_width="135dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="210dp"
+            android:layout_marginTop="544dp"
+            android:layout_marginEnd="67dp"
+            android:layout_marginBottom="163dp"
+            android:text="Velocidade atual:" />
+
+        <Button
+            android:id="@+id/botao_encerrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="245dp"
+            android:layout_marginTop="635dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="40dp"
+            android:text="Encerrar navegação"
+            map:iconTint="#FF5722" />
+
+    </RelativeLayout>
+
+</FrameLayout>

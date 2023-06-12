@@ -1,12 +1,26 @@
 package com.example.tavares_maps;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 //import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,6 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -29,13 +44,32 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Handler;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private boolean map;
     private boolean locationPermissionGranted;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+
+    private boolean isMoving = false;
+
+    private long startTime = 0;
+    private boolean isRunning = false;
+    private TextView textViewtempo_deslocamento;
+    private TextView textViewtempo_chegada;
     ArrayList markerPoints= new ArrayList();
+
+    private String distanceText;
+    private int distanceValue;
+    private String durationText;
+    private int durationValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +79,130 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+
+        //inicializando ass variáveis da tela
+        TextView textViewvel_media = findViewById(R.id.vel_media);
+        textViewtempo_deslocamento = findViewById(R.id.tempo_deslocamento);
+        TextView textViewdist_percorrida = findViewById(R.id.dist_percorrida);
+        TextView textViewconsumo_combustivel = findViewById(R.id.consumo_combustivel);
+        textViewtempo_chegada = findViewById(R.id.tempo_chegada);
+        TextView textViewvel_recomendada = findViewById(R.id.vel_recomendada);
+        TextView textViewvel_atual = findViewById(R.id.vel_atual);
+        Button buttonbotao_iniciar = findViewById(R.id.botao_iniciar);
+        Button buttonbotao_encerrar = findViewById(R.id.botao_encerrar);
+
+
+        buttonbotao_encerrar.setVisibility(View.INVISIBLE);
+        buttonbotao_iniciar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Ação a ser executada quando o botão for clicado
+                // Por exemplo, exibir uma mensagem de clique
+                buttonbotao_iniciar.setVisibility(View.INVISIBLE);
+                buttonbotao_encerrar.setVisibility(View.VISIBLE);
+                startTimer();
+                Toast.makeText(MapsActivity.this, "Botão clicado!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        buttonbotao_encerrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Ação a ser executada quando o botão for clicado
+                buttonbotao_iniciar.setVisibility(View.VISIBLE);
+                buttonbotao_encerrar.setVisibility(View.INVISIBLE);
+                pauseTimer();
+                // Por exemplo, exibir uma mensagem de clique
+                Toast.makeText(MapsActivity.this, "Botão clicado!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
+        //CAÇANDO A VELOCIDADE
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                // Verifique se o dispositivo está se movendo com base na velocidade
+                float speed = location.getSpeed();
+                if (speed > 0) {
+                    isMoving = true;
+                } else {
+                    isMoving = false;
+                }
+
+                // Atualize a velocidade na tela ou tome outras ações necessárias
+                if (isMoving) {
+                    float speedKmph = speed * 3.6f; // converta a velocidade para km/h
+                    // Faça algo com a velocidade atual
+                    textViewvel_media.setText((int) speedKmph);
+
+
+
+
+                }
+            }
+
+            // Outros métodos do LocationListener
+
+        };
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(sensorEventListener);
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+        locationManager.removeUpdates(locationListener);
+    }
+
+    private final SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            // Calcule a aceleração resultante
+            float acceleration = (float) Math.sqrt(x * x + y * y + z * z);
+
+            // Verifique se a aceleração indica movimento
+            if (acceleration > 1.0f) { // ajuste o valor do limiar conforme necessário
+                isMoving = true;
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+                /**
+                 * Manipulates the map once available.
+                 * This callback is triggered when the map is ready to be used.
+                 * This is where we can add markers or lines, add listeners or move the camera. In this case,
+                 * we just add a marker near Sydney, Australia.
+                 * If Google Play services is not installed on the device, the user will be prompted to install
+                 * it inside the SupportMapFragment. This method will only be triggered once the user has
+                 * installed Google Play services and returned to the app.
+                 */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -152,7 +298,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             try {
                 jObject = new JSONObject(jsonData[0]);
-                DirectionsJSONParser parser = new DirectionsJSONParser();
+                CriacaoRota parser = new CriacaoRota();
+
+                JSONArray routesArray = jObject.getJSONArray("routes");
+                JSONObject routeObject = routesArray.getJSONObject(0);
+                JSONArray legsArray = routeObject.getJSONArray("legs");
+                JSONObject legObject = legsArray.getJSONObject(0);
+                JSONObject distanceObject = legObject.getJSONObject("distance");
+                JSONObject durationObject = legObject.getJSONObject("duration");
+
+                distanceText = distanceObject.getString("text");
+                distanceValue  = distanceObject.getInt("value");
+                durationText = durationObject.getString("text");
+                durationValue  = durationObject.getInt("value");
+
+                textViewtempo_chegada.setText(durationText);
+
 
                 routes = parser.parse(jObject);
             } catch (Exception e) {
@@ -256,6 +417,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             urlConnection.disconnect();
         }
         return data;
+    }
+    private void startTimer() {
+        if (!isRunning) {
+            startTime = System.currentTimeMillis();
+            isRunning = true;
+            runTimer();
+        }
+    }
+
+    private void pauseTimer() {
+        isRunning = false;
+    }
+
+    private void runTimer() {
+        final long initialTime = startTime;
+
+        Runnable timerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isRunning) {
+                    long currentTime = System.currentTimeMillis();
+                    long elapsedTime = currentTime - initialTime;
+
+                    int hours = (int) (elapsedTime / (1000 * 60 * 60));
+                    int minutes = (int) ((elapsedTime / (1000 * 60)) % 60);
+                    int seconds = (int) ((elapsedTime / 1000) % 60);
+
+                    String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds);
+                    textViewtempo_deslocamento.setText(time);
+
+                    // Atualiza a cada 1 segundo
+                    textViewtempo_deslocamento.postDelayed(this, 1000);
+                }
+            }
+        };
+
+        timerRunnable.run();
     }
 
 

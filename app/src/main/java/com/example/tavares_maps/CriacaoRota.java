@@ -14,7 +14,7 @@ import java.util.List;
  * Created by anupamchugh on 27/11/15.
  */
 
-public class DirectionsJSONParser {
+public class CriacaoRota {
 
     /** Receives a JSONObject and returns a list of lists containing latitude and longitude */
     public List<List<HashMap<String,String>>> parse(JSONObject jObject){
